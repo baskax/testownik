@@ -15,10 +15,12 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Start from './components/Start';
+import Progress from './components/Progress';
 
 class TestownikScreen extends Component {
   static navigationOptions = {
-    title: "Testownik"
+    title: "Testownik",
+    headerStyle :{display: 'none',alignSelf:'center'},
   };
 
   constructor(props) {
@@ -35,7 +37,7 @@ class TestownikScreen extends Component {
         <View style={styles.halfbox}>
           <TouchableHighlight style={[buttonStyles.button, buttonStyles.spacer]} underlayColor="#7b8d93" onPress={() => navigate('Start')}><Text style={buttonStyles.text}>START</Text></TouchableHighlight>
           <TouchableHighlight style={[buttonStyles.button, buttonStyles.spacer]} underlayColor="#7b8d93" onPress={() => {}}><Text style={buttonStyles.text}>TESTOWNIKI</Text></TouchableHighlight>
-          <TouchableHighlight style={[buttonStyles.button, buttonStyles.spacer]} underlayColor="#7b8d93" onPress={() => {}}><Text style={buttonStyles.text}>POSTĘPY</Text></TouchableHighlight>
+          <TouchableHighlight style={[buttonStyles.button, buttonStyles.spacer]} underlayColor="#7b8d93" onPress={() => navigate('Progress')}><Text style={buttonStyles.text}>POSTĘPY</Text></TouchableHighlight>
           <TouchableHighlight style={[buttonStyles.button, buttonStyles.spacer]} underlayColor="#7b8d93" onPress={() => {BackHandler.exitApp()}}><Text style={buttonStyles.text}>WYJDŹ</Text></TouchableHighlight>
         </View>
       </View>
@@ -85,7 +87,8 @@ const buttonStyles = StyleSheet.create({
 
 export default Testownik = StackNavigator({
   Menu: { screen: TestownikScreen },
-  Start: { screen: Start }
+  Start: { screen: Start },
+  Progress: { screen: Progress }
 });
 
 AppRegistry.registerComponent('Testownik', () => Testownik);

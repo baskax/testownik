@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, AsyncStorage } from 'react-native';
 import Questions from '../pytania.json';
 
 
@@ -28,7 +28,7 @@ export default class Start extends Component {
   }
 
   static navigationOptions = {
-    title: "Start"
+    title: "Test"
   };
 
   checkAnswer() {
@@ -39,6 +39,7 @@ export default class Start extends Component {
         correct:this.state.correct+1,
         done:this.state.done+1
       });
+      this.saveProgress(this.state.actual.id);
     } else {
       this.setState({
         [this.state.actual.poprawna+'btn']:{backgroundColor:'#349434'},
@@ -47,9 +48,57 @@ export default class Start extends Component {
         [this.state.chosen+'txt']:{color:'#FFFFFF'},
         done:this.state.done+1
     });
+    this.saveProgress();
     }
+
     this.getNext();
   }
+
+  increaseCorrect() {
+    AsyncStorage.getItem('correct').then((saved) => {
+        AsyncStorage.setItem('correct', saved+1);
+    }).catch((err) => {
+        AsyncStorage.setItem('correct', 0);
+    });
+  }
+
+  increaseAll() {
+    AsyncStorage.getItem('all').then((saved) => {
+        AsyncStorage.setItem('all', saved+1);
+    }).catch((err) => {
+        AsyncStorage.setItem('all', 0);
+    });
+  }
+
+  saveProgress(qid = null) {
+    if(qid) { //there is question id so the answer is correct
+      this.increaseAll();
+      this.increaseCorrect();
+      qid = String(qid);
+      AsyncStorage.getItem('qid').then((saved) => {
+        console.log(saved);
+        AsyncStorage.setItem('qid', saved+1);
+      }).done().catch((err) => {
+        console.log(err);
+        AsyncStorage.setItem('qid', 0);
+      })
+
+      AsyncStorage.getItem('goodQuestions').then((saved) => {
+        saved.push(qid);
+        AsyncStorage.setItem('goodQuestions', saved);
+      }).catch((err) => {
+        var learnt = new Set(qid);
+        AsyncStorage.setItem('goodQuestions', learnt);
+      })
+    } else {
+      this.increaseAll();
+    }
+
+
+
+
+  }
+
 
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -88,12 +137,15 @@ export default class Start extends Component {
   getRandomQuestion() {
     this.resetButtons();
     let question = this.getRandomInt(0,this.state.questions.length);
-    this.setState({actual:this.state.questions[question]});
+    let actual = this.state.questions[question];
+    actual.id = question
+    this.setState({actual:actual});
   }
 
   render() {
     return(
       <View style={styles.container}>
+      <Text style={styles.category}>{this.state.actual.kategoria}</Text>
       <View style={styles.questionbox}>
       <Text style={styles.question}>{this.state.actual.tresc}</Text>
       </View>
@@ -139,6 +191,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'left',
     margin: 10,
+  },
+  category : {
+    color: '#7b8d93',
+    fontSize: 10,
+    textAlign: 'right',
+    fontWeight: 'bold',
+    position: 'absolute',
+    top: 0,
+    right: 5
+
   },
   footer: {
     color: '#7b8d93',
