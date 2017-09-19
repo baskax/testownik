@@ -50,24 +50,29 @@ export default class Start extends Component {
     });
     this.saveProgress();
     }
-
     this.getNext();
   }
 
   increaseCorrect() {
     AsyncStorage.getItem('correct').then((saved) => {
-        AsyncStorage.setItem('correct', saved+1);
-    }).catch((err) => {
-        AsyncStorage.setItem('correct', 0);
-    });
+      if (saved !== null) {
+        saved = parseInt(saved);
+        saved++;
+        saved = String(saved);
+        AsyncStorage.setItem('correct', saved).then().catch((err) => {console.log(err)});
+      } else AsyncStorage.setItem('correct', '0').then().catch((err) => {console.log(err)});
+    }).done();
   }
 
   increaseAll() {
     AsyncStorage.getItem('all').then((saved) => {
-        AsyncStorage.setItem('all', saved+1);
-    }).catch((err) => {
-        AsyncStorage.setItem('all', 0);
-    });
+      if (saved !== null) {
+        saved = parseInt(saved);
+        saved++;
+        saved = String(saved);
+        AsyncStorage.setItem('all', saved).then().catch((err) => {console.log(err)});
+      } else AsyncStorage.setItem('all', '0').then().catch((err) => {console.log(err)});
+    }).done();
   }
 
   saveProgress(qid = null) {
@@ -75,36 +80,42 @@ export default class Start extends Component {
       this.increaseAll();
       this.increaseCorrect();
       qid = String(qid);
-      AsyncStorage.getItem('qid').then((saved) => {
-        console.log(saved);
-        AsyncStorage.setItem('qid', saved+1);
-      }).done().catch((err) => {
-        console.log(err);
-        AsyncStorage.setItem('qid', 0);
-      })
+      AsyncStorage.getItem(qid).then((saved) => {
+        if(saved !== null)  {
+          saved = parseInt(saved);
+          saved++;
+          saved = String(saved);
+          AsyncStorage.setItem(qid, saved).then().catch((err) => {console.log(err)});
+        }
+        else AsyncStorage.setItem(qid, '0').then().catch((err) => {console.log(err)});
+      }).done();
 
+
+      //problem z krotką
+      /*
       AsyncStorage.getItem('goodQuestions').then((saved) => {
-        saved.push(qid);
-        AsyncStorage.setItem('goodQuestions', saved);
-      }).catch((err) => {
-        var learnt = new Set(qid);
-        AsyncStorage.setItem('goodQuestions', learnt);
-      })
+        if(saved !== null)  {
+          saved = JSON.parse(saved);
+          saved.add(qid);
+          AsyncStorage.setItem('goodQuestions', JSON.stringify(saved)).then().catch((err) => {console.log(err)});
+        } else {
+          var learnt = new Set(qid);
+          AsyncStorage.setItem('goodQuestions', JSON.stringify(learnt)).then().catch((err) => {console.log(err)});
+        }
+      }).done();*/
     } else {
       this.increaseAll();
     }
 
-
-
-
   }
-
 
   getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   componentDidMount() {
+    AsyncStorage.getItem('all').then((all) => {this.setState({done:parseInt(all)})}).done();
+    AsyncStorage.getItem('correct').then((correct) => {this.setState({correct:parseInt(correct)})}).done();
     this.getRandomQuestion();
   }
 

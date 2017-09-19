@@ -8,7 +8,14 @@ export default class Progress extends Component {
     super(props);
     this.state = {
       questions: Questions.pytania,
+      done: 0
     }
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem('correct').then((saved) => {
+      if(saved !== null) this.setState({done:saved});
+    }).done();
   }
 
   static navigationOptions = {
@@ -17,7 +24,7 @@ export default class Progress extends Component {
 
   render() {
     return(
-      <View/>
+      <View><Text>Tu sie kurwa cos dzieje! {this.state.done}</Text></View>
     );
   }
 }
